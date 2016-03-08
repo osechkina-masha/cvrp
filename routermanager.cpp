@@ -8,7 +8,7 @@
 
 RouterManager::RouterManager(const std::string &folder) :
 	mFileReader(folder)
-  ,  mFinished(false)
+  , mFinished(false)
   , mProgress(new Progress())
 {
 #ifdef WITH_LOG
@@ -16,7 +16,23 @@ RouterManager::RouterManager(const std::string &folder) :
 #endif
 	mDistances = mFileReader.getDistances();
 	mVelocityCalc = mFileReader.getVelocityRestrictions();
-	mRestrictionChecker = std::shared_ptr<RestrictionChecker>(new RestrictionChecker(mFileReader.getTrucks(), mFileReader.getTime()));
+    mRestrictionChecker = std::shared_ptr<RestrictionChecker>(
+                new RestrictionChecker(mFileReader.getTrucks(), mFileReader.getTime()));
+    mCustomers = mFileReader.getCustomers();
+    mTrucks = mFileReader.getTrucks();
+}
+
+RouterManager::RouterManager(const std::vector<std::string> &data) :
+      mFinished(false)
+    , mProgress(new Progress())
+    , mSamplesParser(data)
+{
+    mDistances = mSamplesParser.getDistances();
+    mCustomers = mSamplesParser.getCustomers();
+    mTrucks = mSamplesParser.getTrucks();
+    mRestrictionChecker = std::shared_ptr<RestrictionChecker>(
+                new RestrictionChecker(mTrucks));
+
 }
 
 void RouterManager::calculate()
@@ -111,12 +127,12 @@ void RouterManager::operator ()()
 	mUsedTrucks.clear();
 	mRoutesNoTruck.clear();
 	mTruckRoute.clear();
-	std::vector<Truck> trucks = mFileReader.getTrucks();
+
 #ifdef WITH_LOG
-	std::cout << "number of trucks " << trucks.size() << std::endl;
+    std::cout << "number of mTrucks " << mTrucks.size() << std::endl;
 #endif
-	std::vector<Customer> customers = mFileReader.getCustomers();
-	std::unordered_set<std::shared_ptr<Route>> initialRoutes = customersToRoutes(customers);
+
+    std::unordered_set<std::shared_ptr<Route>> initialRoutes = customersToRoutes(mCustomers);
 	std::unordered_set<std::shared_ptr<Route>> badRoutes = mRestrictionChecker->initByRoutes(initialRoutes);
 	for (std::shared_ptr<Route> const &badRoute: badRoutes)
 	{
@@ -125,7 +141,7 @@ void RouterManager::operator ()()
 	}
 	mClarkeWrightAlgorithm = ClarkeWrightAlgorithm(mDistances, std::shared_ptr<RestrictionChecker>(mRestrictionChecker), mProgress);
 #ifdef WITH_LOG
-	std::cout << "create clark wright ";
+    std::cout << "create clark wright " << std::endl;
 #endif
 	std::unordered_set<std::shared_ptr<Route> > routes = mClarkeWrightAlgorithm.calculate(initialRoutes);
 	std::vector<std::vector<int>> graph;
@@ -135,9 +151,9 @@ void RouterManager::operator ()()
 		std::vector<int> possible;
 		PassTimeInfo info = mRestrictionChecker->getTimeInfo(route);
 
-		for (unsigned int j = 0; j < trucks.size(); j ++)
+        for (unsigned int j = 0; j < mTrucks.size(); j ++)
 		{
-			if (mRestrictionChecker->isSatisfy(route, info, trucks[j]))
+            if (mRestrictionChecker->isSatisfy(route, info, mTrucks[j]))
 			{
 				possible.push_back(j);
 			}
@@ -145,14 +161,20 @@ void RouterManager::operator ()()
 		graph.push_back(possible);
 		routesInGraph.insert(std::pair<int, std::shared_ptr<Route>>(graph.size() - 1, route));
 	}
-	std::vector<int> matching = getMatching(graph, trucks.size());
+#ifdef WITH_LOG
+    std::cout << "finish check routes \n";
+#endif
+    std::vector<int> matching = getMatching(graph, mTrucks.size());
+#ifdef WITH_LOG
+    std::cout << "got matching \n";
+#endif
 	for (unsigned int i = 0; i < matching.size(); i ++)
 	{
 		if (matching[i] < 0)
 		{
 			continue;
 		}
-		unsigned int id = trucks[i].id;
+        unsigned int id = mTrucks[i].id;
 		mUsedTrucks.push_back(id);
 		mTruckRoute[id] = routesInGraph[matching[i]];
 		routes.erase(routesInGraph[matching[i]]);
@@ -164,10 +186,38 @@ void RouterManager::operator ()()
 
 #ifdef WITH_LOG
 	double sum = 0;
+    double s1 = 0;
+    double s2 = 0;
+    double s3 = 0;
+    double avLength = 0;
+    double maxLength = 0;
+    double custId = 1;
+    for (Customer const &cust : mCustomers)
+    {
+        if (cust.zone == 0)
+        {
+            s3 += cust.package.weight;
+        }
+        else if (cust.zone == 1)
+        {
+            s1 += cust.package.weight;
+        }
+        else if (cust.zone == 3)
+        {
+            s2 += cust.package.weight;
+        }
+        avLength += mDistances->at(Pair(0, custId));
+        maxLength = std::max(maxLength, mDistances->at(Pair(0, custId)));
+        custId ++;
+    }
+    std::cout << "sum weight in zone 2 is " << s2 << std::endl;
+    std::cout << "sum weight in zone 1 is " << s1 << std::endl;
+    std::cout << "sum weight in zone 3 is " << s3 << std::endl;
+    std::cout << "average distance is " << avLength / mCustomers.size() << " max dist " << maxLength << std::endl;
 	for (auto pair: mTruckRoute)
 	{
 		double truckWeight = 0;
-		for (Truck const &truck: trucks)
+        for (Truck const &truck: mTrucks)
 		{
 			if (pair.first == truck.id)
 			{
@@ -180,11 +230,11 @@ void RouterManager::operator ()()
 		std::cout << " truck max weight " << truckWeight << std::endl;
 		std::cout << " max route Volume " << pair.second->maxVolume() << std::endl;
 		std::cout << "number of customers in route is " << pair.second->allCustomers().size() << " total length "
-				  << routeLength(pair.second->customerIds()) << std::endl;
+                  << routeLength(pair.second->customerIds()) << std::endl;
 		std::cout << "route zone is " << pair.second->getZone() <<std::endl;
 	}
-	std::cout << "number of used trucks " << mUsedTrucks.size() << std::endl;
-	std::cout << "number of routes without trucks is " << mRoutesNoTruck.size() << std::endl;
+    std::cout << "number of used mTrucks " << mUsedTrucks.size() << std::endl;
+    std::cout << "number of routes without mTrucks is " << mRoutesNoTruck.size() << std::endl;
 	for (unsigned int i = 0; i < mRoutesNoTruck.size(); i ++)
 	{
 		sum += routeLength(mRoutesNoTruck[i]->customerIds());
@@ -246,5 +296,8 @@ std::unordered_set<std::shared_ptr<Route> > RouterManager::customersToRoutes(con
 		std::shared_ptr<Route> route(new Route(curCustomer));
 		routes.insert(route);
 	}
+#ifdef WITH_LOG
+    std::cout << "converted customers to routes" << std::endl;
+#endif
 	return routes;
 }

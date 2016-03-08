@@ -115,7 +115,9 @@ bool RestrictionChecker::updateMaxValidRelations(const std::vector<RouteWithTruc
 	}
 	bool betterSolution = false;
 	std::vector<unsigned int> newValidRelations(mValidRelations.begin(), mValidRelations.begin() + count);
-	for (unsigned int i = count; i < graph.size(); i ++)
+	for (unsigned int i = count;
+		 //i < mTrucks.size(); i ++)
+		 i < graph.size(); i ++)
 	{
 		workGraph.push_back(graph[i].truckNums);
 		unsigned int matchingSize = getMaxMatchingSize(workGraph, mTrucks.size());
@@ -160,17 +162,22 @@ bool RestrictionChecker::updateMaxValidRelations(const std::vector<RouteWithTruc
 
 bool RestrictionChecker::isSatisfy(const std::shared_ptr<Route> &route, const PassTimeInfo &info, const Truck &truck)
 {
-	return (truck.finishTime - truck.startTime >= info.passTime) && (info.maxBeginTime >= truck.startTime) &&
-			(info.minBeginTime + info.passTime <= truck.finishTime) &&
-			info.isTWOk && (route->maxVolume() <= truck.capacity.volumeCapacity)
-			&& (route->maxWeight() <= truck.capacity.weightCapacity) && ((route->getZone() & truck.zone) == route->getZone())
-			&& ((route->getLoadType() & truck.loadType) == route->getLoadType()) && info.pointNumber <= truck.maxClients;
+	return truck.capacity.weightCapacity >= route->maxWeight();
+//    return (truck.finishTime - truck.startTime >= info.passTime)
+//            && (info.maxBeginTime >= truck.startTime)
+//            && (info.minBeginTime + info.passTime <= truck.finishTime)
+//            && info.isTWOk
+//            && (route->maxVolume() <= truck.capacity.volumeCapacity)
+//            && (route->maxWeight() <= truck.capacity.weightCapacity)
+//            && ((route->getZone() & truck.zone) == route->getZone())
+//            && ((route->getLoadType() & truck.loadType) == route->getLoadType())
+//            && info.pointNumber <= truck.maxClients;
 }
 
 PassTimeInfo RestrictionChecker::getTimeInfo(const std::shared_ptr<Route> &route)
 {
 	std::vector<Customer> customers = route->allCustomers();
-	if (customers.empty())
+	if (customers.empty() || !mTime)
 	{
 		return PassTimeInfo(0, 0, 0, 0);
 	}

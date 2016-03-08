@@ -2,6 +2,7 @@
 
 #include <string>
 #include <ctime>
+#include <limits>
 
 struct Capacity
 {
@@ -22,7 +23,8 @@ struct Truck {
 
 public:
 	Truck(unsigned int curId, double wCapacity, double vCapacity, int curZone = 0, int curLoadType = 0
-		, std::time_t curStartTime = 9 * 60 * 60, std::time_t curFinishTime = 18 * 60 * 60, int curMaxClients = 255, double koef = 1.0);
+        , std::time_t curStartTime = 9 * 60 * 60, std::time_t curFinishTime = 18 * 60 * 60,
+          int curMaxClients = std::numeric_limits<int>::max(), double koef = 1.0);
 	unsigned int id;
 	Capacity capacity;
 	std::time_t startTime;

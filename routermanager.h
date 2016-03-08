@@ -7,11 +7,13 @@
 #include "filereader.h"
 #include "clarkewrightalgorithm.h"
 #include "routeinfo.h"
+#include "samplesparser.h"
 
 class RouterManager
 {
 public:
-	RouterManager(std::string const &folder);
+    explicit RouterManager(std::string const &folder);
+    explicit RouterManager(std::vector<std::string> const &data);
 	void calculate();
 	std::vector<unsigned int> getUsedTrucks();
 	std::vector<unsigned int> getRouteByTruck(unsigned int truckId);
@@ -37,4 +39,7 @@ private:
 	VelocityCalculator mVelocityCalc;
 	std::vector<std::shared_ptr<Route>> mRoutesNoTruck;
 	std::shared_ptr<Progress> mProgress;
+    SamplesParser mSamplesParser;
+    std::vector<Customer> mCustomers;
+    std::vector<Truck> mTrucks;
 };

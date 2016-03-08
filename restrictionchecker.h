@@ -77,7 +77,7 @@ class RestrictionChecker
 {
 public:
 	RestrictionChecker();
-	RestrictionChecker(std::vector<Truck> const &trucks, std::shared_ptr<std::unordered_map<Pair, time_type, PairHash> > const &time, double maxWaitTime = 15.0 * 60.0);
+	RestrictionChecker(std::vector<Truck> const &trucks, std::shared_ptr<std::unordered_map<Pair, time_type, PairHash> > const &time = NULL, double maxWaitTime = 15.0 * 60.0);
 	std::unordered_set<std::shared_ptr<Route>> initByRoutes(const std::unordered_set<std::shared_ptr<Route>> &routes);
 	bool checkAndUpdateRestrictions(std::shared_ptr<Route> const &newRoute, std::shared_ptr<Route> const &removed1, std::shared_ptr<Route> const &removed2);
 	void setWaitTimeParams(double newWaitTime);

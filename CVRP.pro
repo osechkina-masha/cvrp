@@ -1,7 +1,7 @@
 TEMPLATE = app
 CONFIG += console
 CONFIG -= app_bundle
-CONFIG -= qt
+#CONFIG -= qt
 QMAKE_CXXFLAGS+=-Wl,--no-as-needed
 QMAKE_CXXFLAGS+=-pthread
 QMAKE_CXXFLAGS += -std=c++11
@@ -15,7 +15,7 @@ INCLUDEPATH += "/usr/include/php5/Zend"
 INCLUDEPATH += "/usr/include/php5/TSRM"
 
 DEFINES += WITH_LOG
-#DEFINES += WITH_DEBUG
+DEFINES += WITH_DEBUG
 
 SOURCES += main.cpp \
     route.cpp \
@@ -32,7 +32,8 @@ SOURCES += main.cpp \
     #capacity.cpp
     velocitycalculator.cpp \
     adopter.cpp \
-    progress.cpp
+    progress.cpp \
+    samplesparser.cpp
 
 HEADERS += \
     customer.h \
@@ -50,7 +51,8 @@ HEADERS += \
     #capacity.h
     adopter.h \
     velocitycalculator.h \
-    progress.h
+    progress.h \
+    samplesparser.h
 
 OTHER_FILES += \
     config.m4

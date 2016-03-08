@@ -14,6 +14,15 @@ using namespace std;
 
 int main()
 {
+    std::vector<std::string> filesPath;
+
+
+//    filesPath.push_back("\/home\/masha\/cvrp_samples\/E022-04g.dat");
+//    filesPath.push_back("\/home\/masha\/cvrp_samples\/E016-03m.dat");
+//    filesPath.push_back("\/home\/masha\/cvrp_samples\/E016-05m.dat");
+    filesPath.push_back("\/home\/masha\/cvrp_samples\/E481-38k.dat");
+
+    RouterManager rm(filesPath);
 	std::clock_t time = clock();
 	//RouterManager rm("\/home\/masha\/manyClients\/");
 	//RouterManager rm("\/home\/masha\/baikal\/");
@@ -23,7 +32,7 @@ int main()
 	//RouterManager rm("\/home\/masha\/KalugFolder\/");
 	//RouterManager rm("\/home\/masha\/noKalug\/");
 	//RouterManager rm("\/home\/masha\/19augWithKalug/");
-    RouterManager rm("\/home\/masha\/testVRP\/");
+    //RouterManager rm("\/home\/masha\/testVRP\/");
 //	RouterManager rm("\/home\/masha\/testT3\/");
 //	RouterManager rm("\/home\/masha\/cw22.07.2014\/");
 //	RouterManager rm("\/home\/masha\/testLogitera\/");

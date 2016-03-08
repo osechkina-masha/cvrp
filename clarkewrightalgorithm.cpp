@@ -108,6 +108,9 @@ std::unordered_set<std::shared_ptr<Route> > ClarkeWrightAlgorithm::calculate(con
 		mCostCalculator.update(route1, route2, mergedRoute);
 		mProgress->setProgress(mCostCalculator.allPairs());
 	}
+#ifdef WITH_LOG
+	std::cout << "finish calculation \n";
+#endif
 	return routes;
 }
 
