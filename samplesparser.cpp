@@ -32,9 +32,9 @@ void SamplesParser::parseFiles(const std::vector<std::string> &filesPath)
 {
 	//std::vector<unsigned int> weights;
 	std::unordered_map<unsigned int, std::pair<double, double>> coordsShift;
+	std::size_t maxId = 0;
 	for (const std::string& path: filesPath)
 	{
-		std::size_t prevSize = coordsShift.size() + 1;
 		std::ifstream stream(path);
 		if (!stream)
 		{
@@ -138,13 +138,21 @@ void SamplesParser::parseFiles(const std::vector<std::string> &filesPath)
 			std::cout << "RULE IS INCORECT! DEPOT NOT FIRST!!!" <<std::endl;
 		}
 		std::pair<double, double> depotCoord = coords.at(depotId);
+		std::size_t curMaxId = maxId;
 		for (std::pair<unsigned int, unsigned int> weight : weights)
 		{
 			if (weight.first == depotId)
 			{
 				continue;
 			}
-			mCustomers.push_back(Customer(prevSize + weight.first, Package(weight.second, 0)));
+#ifdef WITH_LOG
+			if (!mCustomers.empty() && maxId + weight.first <= mCustomers.back().id)
+			{
+				std::cout << "bad id creation!!!" << std::endl;
+			}
+#endif
+			mCustomers.push_back(Customer(maxId + weight.first, Package(weight.second, 0)));
+			curMaxId = std::max(maxId + weight.first, curMaxId);
 		}
 		for (auto coordPair : coords)
 		{
@@ -152,11 +160,12 @@ void SamplesParser::parseFiles(const std::vector<std::string> &filesPath)
 			if (coordPair.first != depotId)
 			{
 				//TODO::NOT THE SAME ORDER!!!!!
-				coordsShift.insert(std::make_pair(coordPair.first + prevSize,
+				coordsShift.insert(std::make_pair(coordPair.first + maxId,
 												  std::make_pair(curCoord.first - depotCoord.first,
 																 curCoord.second - depotCoord.second)));
 			}
 		}
+		maxId = curMaxId + 1;
 	}
 	for (auto firstPair : coordsShift)
 	{

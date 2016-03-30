@@ -81,9 +81,17 @@ bool RestrictionChecker::checkAndUpdateRestrictions(const std::shared_ptr<Route>
 #endif
 		return false;
 	}
-	if (/*!changed &&*/ mConflictRoutes.find(newRoute) != mConflictRoutes.end())
+	int choose = -1;
+	int probabilityMax = 1;
+	if (!changed)
 	{
-			return false;
+		choose = rand() % probabilityMax;
+	}
+	if (//!changed &&
+		choose == 0 &&
+		mConflictRoutes.find(newRoute) != mConflictRoutes.end())
+	{
+		return false;
 	}
 	mRoutes.erase(removed1);
 	mRoutes.erase(removed2);
