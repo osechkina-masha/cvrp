@@ -32,7 +32,8 @@ void SamplesParser::parseFiles(const std::vector<std::string> &filesPath)
 {
 	//std::vector<unsigned int> weights;
 	std::unordered_map<unsigned int, std::pair<double, double>> coordsShift;
-	std::size_t maxId = 0;
+	std::size_t maxId = 1;
+	std::size_t zoneShift = 0;
 	for (const std::string& path: filesPath)
 	{
 		std::ifstream stream(path);
@@ -77,7 +78,8 @@ void SamplesParser::parseFiles(const std::vector<std::string> &filesPath)
 		unsigned int vehicles = std::stoi(vehiclesMatch[3].str());
 		for (unsigned int i = 0; i < vehicles; ++i)
 		{
-			mTrucks.push_back(Truck(mTrucks.size(), capacity, 0));
+			mTrucks.push_back(Truck(mTrucks.size(), capacity, 0, 1 << zoneShift));
+			std::cout << "zone is " << (1 << zoneShift) << std::endl;
 		}
 		std::getline(stream, str); //NODE_COORD_SECTION
 		std::unordered_map<unsigned int, std::pair<double, double>> coords;
@@ -151,7 +153,8 @@ void SamplesParser::parseFiles(const std::vector<std::string> &filesPath)
 				std::cout << "bad id creation!!!" << std::endl;
 			}
 #endif
-			mCustomers.push_back(Customer(maxId + weight.first, Package(weight.second, 0)));
+			mCustomers.push_back(Customer(maxId + weight.first, Package(weight.second, 0), Customer::DeliveryFromDepot,
+										  0, 1 << zoneShift));
 			curMaxId = std::max(maxId + weight.first, curMaxId);
 		}
 		for (auto coordPair : coords)
@@ -166,6 +169,7 @@ void SamplesParser::parseFiles(const std::vector<std::string> &filesPath)
 			}
 		}
 		maxId = curMaxId + 1;
+		++zoneShift;
 	}
 	for (auto firstPair : coordsShift)
 	{

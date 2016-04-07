@@ -85,10 +85,12 @@ bool RestrictionChecker::checkAndUpdateRestrictions(const std::shared_ptr<Route>
 	int probabilityMax = 1;
 	if (!changed)
 	{
+		//srand(time(NULL));
 		choose = rand() % probabilityMax;
 	}
 	if (//!changed &&
 		choose == 0 &&
+		//	choose > 0 &&
 		mConflictRoutes.find(newRoute) != mConflictRoutes.end())
 	{
 		return false;
@@ -170,7 +172,10 @@ bool RestrictionChecker::updateMaxValidRelations(const std::vector<RouteWithTruc
 
 bool RestrictionChecker::isSatisfy(const std::shared_ptr<Route> &route, const PassTimeInfo &info, const Truck &truck)
 {
-	return truck.capacity.weightCapacity >= route->maxWeight();
+	return truck.capacity.weightCapacity >= route->maxWeight()
+			&& ((route->getZone() & truck.zone) == route->getZone())
+			//&& route->customerIds().size() <= 40
+			;
 //    return (truck.finishTime - truck.startTime >= info.passTime)
 //            && (info.maxBeginTime >= truck.startTime)
 //            && (info.minBeginTime + info.passTime <= truck.finishTime)

@@ -14,6 +14,7 @@ using namespace std;
 
 int main()
 {
+	srand(time(NULL));
 	std::vector<std::string> filesPath;
 
 
@@ -25,21 +26,23 @@ int main()
 	//filesPath.push_back("\/home\/masha\/cvrp_samples\/E481-38k.dat"); //0 unmatched routes
 
 
-//	filesPath.push_back("\/home\/masha\/cvrp_samples\/E101-08e.dat");  //cap =200 0 unmatched routes
+	//filesPath.push_back("\/home\/masha\/cvrp_samples\/E101-08e.dat");  //cap =200 0 unmatched routes
 	//filesPath.push_back("\/home\/masha\/cvrp_samples\/E101-10c.dat"); //cap =200 0 unmatched routes
-//	filesPath.push_back("\/home\/masha\/cvrp_samples\/E101-14s.dat"); //cap =112 0 unmatched routes
+	filesPath.push_back("\/home\/masha\/cvrp_samples\/E101-14s.dat"); //cap =112 0 unmatched routes
+	//filesPath.push_back("\/home\/masha\/cvrp_samples\/E121-07c.dat"); // cap = 200 0 unmatched routes
+	filesPath.push_back("\/home\/masha\/cvrp_samples\/E135-07f.dat"); //cap = 2210  0 unmatched routes
+	//filesPath.push_back("\/home\/masha\/cvrp_samples\/E151-12b.dat"); // cap = 200 0 unmatched routes
+	//filesPath.push_back("\/home\/masha\/cvrp_samples\/E151-12c.dat"); // cap = 200 0 unmatched routes
+	//filesPath.push_back("\/home\/masha\/cvrp_samples\/E101C11r.dat");  //cap =2043 0 unmatched route
+	//filesPath.push_back("\/home\/masha\/cvrp_samples\/E151B14r.dat"); //cap = 1918 0 unmatched routes
 
-
-//	filesPath.push_back("\/home\/masha\/cvrp_samples\/E121-07c.dat"); // cap = 200
-	//filesPath.push_back("\/home\/masha\/cvrp_samples\/E135-07f.dat"); //cap = 2210
-	//	filesPath.push_back("\/home\/masha\/cvrp_samples\/E151-12b.dat"); // cap = 200
-		filesPath.push_back("\/home\/masha\/cvrp_samples\/E151-12c.dat"); // cap = 200
 
 //	filesPath.push_back("\/home\/masha\/cvrp_samples\/E101A11r.dat");  //cap =1409 1 unmatched route
 //	filesPath.push_back("\/home\/masha\/cvrp_samples\/E101B11r.dat");  //cap =1842 1 unmatched route
-
-	filesPath.push_back("\/home\/masha\/cvrp_samples\/E101C11r.dat");  //cap =2043 0 unmatched route
 	//filesPath.push_back("\/home\/masha\/cvrp_samples\/E101D11r.dat");  //cap = 1297 1 unmatched route
+	//filesPath.push_back("\/home\/masha\/cvrp_samples\/E151A15r.dat"); //cap = 1544 1 unmatched route
+	//filesPath.push_back("\/home\/masha\/cvrp_samples\/E151C14r.dat"); //cap = 1544 1 unmatched route
+	//filesPath.push_back("\/home\/masha\/cvrp_samples\/E151D14r.dat"); //cap = 1544 2 unmatched routes
 
 	RouterManager rm(filesPath);
 	std::clock_t time = clock();
