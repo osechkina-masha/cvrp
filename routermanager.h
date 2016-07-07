@@ -3,6 +3,8 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 #include "filereader.h"
 #include "clarkewrightalgorithm.h"
@@ -13,7 +15,7 @@ class RouterManager
 {
 public:
     explicit RouterManager(std::string const &folder);
-    explicit RouterManager(std::vector<std::string> const &data);
+    explicit RouterManager(std::vector<std::string> const &data, std::ofstream& stream);
 	void calculate();
 	std::vector<unsigned int> getUsedTrucks();
 	std::vector<unsigned int> getRouteByTruck(unsigned int truckId);
@@ -42,4 +44,5 @@ private:
     SamplesParser mSamplesParser;
     std::vector<Customer> mCustomers;
     std::vector<Truck> mTrucks;
+    std::ofstream& mStream;
 };

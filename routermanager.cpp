@@ -6,10 +6,13 @@
 #include "routermanager.h"
 #include "adopter.h"
 
+static std::ofstream STR;
+
 RouterManager::RouterManager(const std::string &folder) :
 	mFileReader(folder)
   , mFinished(false)
   , mProgress(new Progress())
+  , mStream(STR)
 {
 #ifdef WITH_LOG
 	std::cout << folder << std::endl;
@@ -22,10 +25,11 @@ RouterManager::RouterManager(const std::string &folder) :
 	mTrucks = mFileReader.getTrucks();
 }
 
-RouterManager::RouterManager(const std::vector<std::string> &data) :
+RouterManager::RouterManager(const std::vector<std::string> &data, std::ofstream &stream) :
 	  mFinished(false)
 	, mProgress(new Progress())
 	, mSamplesParser(data)
+    , mStream(stream)
 {
 	mDistances = mSamplesParser.getDistances();
 	mCustomers = mSamplesParser.getCustomers();
@@ -222,10 +226,18 @@ void RouterManager::operator ()()
 		avLength += mDistances->at(Pair(0, cust.id));
 		maxLength = std::max(maxLength, mDistances->at(Pair(0, cust.id)));
     }
-    std::cout << "sum weight in zone 2 is " << s2 << std::endl;
-    std::cout << "sum weight in zone 1 is " << s1 << std::endl;
-    std::cout << "sum weight in zone 3 is " << s3 << std::endl;
-	std::cout << "average distance is " << avLength / mCustomers.size() << " max dist " << maxLength << std::endl;
+    //std::cout
+        mStream
+            << "sum weight in zone 2 is " << s2 << std::endl;
+    //std::cout
+        mStream
+            << "sum weight in zone 1 is " << s1 << std::endl;
+    //std::cout
+        mStream
+            << "sum weight in zone 3 is " << s3 << std::endl;
+    //std::cout
+        mStream
+            << "average distance is " << avLength / mCustomers.size() << " max dist " << maxLength << std::endl;
 	for (auto pair: mTruckRoute)
 	{
 		double truckWeight = 0;
@@ -237,22 +249,42 @@ void RouterManager::operator ()()
 			}
 		}
 		sum += routeLength(pair.second->customerIds());
-		std::cout << "\n TRUCK ID IS " << pair.first << std::endl;
-		std::cout << " max route weight " << pair.second->maxWeight() << std::endl;
-		std::cout << " truck max weight " << truckWeight << std::endl;
-		std::cout << " max route Volume " << pair.second->maxVolume() << std::endl;
-		std::cout << "number of customers in route is " << pair.second->allCustomers().size() << " total length "
+        //std::cout
+        mStream
+                << "\n TRUCK ID IS " << pair.first << std::endl;
+        //std::cout
+        mStream
+                << " max route weight " << pair.second->maxWeight() << std::endl;
+        //std::cout
+        mStream
+                << " truck max weight " << truckWeight << std::endl;
+        //std::cout
+        mStream
+                << " max route Volume " << pair.second->maxVolume() << std::endl;
+        //std::cout
+        mStream
+                << "number of customers in route is " << pair.second->allCustomers().size() << " total length "
                   << routeLength(pair.second->customerIds()) << std::endl;
-		std::cout << "route zone is " << pair.second->getZone() <<std::endl;
+        //std::cout
+        mStream
+                << "route zone is " << pair.second->getZone() <<std::endl;
 	}
-	std::cout << "number of used mTrucks " << mUsedTrucks.size() << std::endl;
-	std::cout << "number of routes without mTrucks is " << mRoutesNoTruck.size() << std::endl;
+    //std::cout
+    mStream
+            << "number of used mTrucks " << mUsedTrucks.size() << std::endl;
+    //std::cout
+    mStream
+            << "number of routes without mTrucks is " << mRoutesNoTruck.size() << std::endl;
 	for (unsigned int i = 0; i < mRoutesNoTruck.size(); i ++)
 	{
 		sum += routeLength(mRoutesNoTruck[i]->customerIds());
-		std::cout << "\n number of customers in route without truck is " << mRoutesNoTruck[i]->allCustomers().size() << std::endl;
+        //std::cout
+        mStream
+                << "\n number of customers in route without truck is " << mRoutesNoTruck[i]->allCustomers().size() << std::endl;
 	}
-	std::cout << "sum length " << sum << std::endl;
+    //std::cout
+    mStream
+            << "sum length " << sum << std::endl;
 #endif
 	mFinished = true;
 }

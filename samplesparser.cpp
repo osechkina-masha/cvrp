@@ -169,7 +169,7 @@ void SamplesParser::parseFiles(const std::vector<std::string> &filesPath)
 			}
 		}
 		maxId = curMaxId + 1;
-		++zoneShift;
+        //++zoneShift;
 	}
 	for (auto firstPair : coordsShift)
 	{
